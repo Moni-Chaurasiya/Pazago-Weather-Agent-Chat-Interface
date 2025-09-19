@@ -1,31 +1,41 @@
-import React, { useEffect, useRef } from 'react';
-import Message from './Message';
-import LoadingMessage from './LoadingMessage';
-import ErrorMessage from './ErrorMessage';
-import { useChat } from '../context/ChatContext';
+import React, { useEffect, useRef, useState } from "react";
+import Message from "./Message";
+import LoadingMessage from "./LoadingMessage";
+import ErrorMessage from "./ErrorMessage";
+import { useChat } from "../context/ChatContext";
 
 function MessageList() {
   const { messages, isLoading, error, searchQuery, filteredMessages } = useChat();
   const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
+  const [isAtBottom, setIsAtBottom] = useState(true);
 
-  // Auto-scroll to bottom when new messages arrive
+  // Auto-scroll only if user is at bottom
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
   };
 
   useEffect(() => {
-    if (!searchQuery) {
+    if (isAtBottom && !searchQuery) {
       scrollToBottom();
     }
-  }, [messages, isLoading, searchQuery]);
+  }, [messages, isLoading, searchQuery, isAtBottom]);
 
-  // Determine which messages to show
+  // Track scroll position
+  const handleScroll = () => {
+    if (!containerRef.current) return;
+    const { scrollTop, scrollHeight, clientHeight } = containerRef.current;
+    const isNearBottom = scrollHeight - scrollTop - clientHeight < 50; // threshold
+    setIsAtBottom(isNearBottom);
+  };
+
+  // Decide which messages to show
   const displayMessages = searchQuery ? filteredMessages : messages;
 
   return (
-    <div 
+    <div
       ref={containerRef}
+      onScroll={handleScroll}
       className="flex-1 overflow-y-auto px-4 py-4 space-y-4"
     >
       {/* Welcome Message */}
@@ -54,21 +64,18 @@ function MessageList() {
       {searchQuery && (
         <div className="text-center py-2">
           <p className="text-sm text-gray-500 dark:text-gray-400">
-            {filteredMessages.length > 0 
-              ? `Found ${filteredMessages.length} message${filteredMessages.length !== 1 ? 's' : ''} matching "${searchQuery}"`
-              : `No messages found for "${searchQuery}"`
-            }
+            {filteredMessages.length > 0
+              ? `Found ${filteredMessages.length} message${
+                  filteredMessages.length !== 1 ? "s" : ""
+                } matching "${searchQuery}"`
+              : `No messages found for "${searchQuery}"`}
           </p>
         </div>
       )}
 
       {/* Messages */}
       {displayMessages.map((message) => (
-        <Message 
-          key={message.id} 
-          message={message}
-          searchQuery={searchQuery}
-        />
+        <Message key={message.id} message={message} searchQuery={searchQuery} />
       ))}
 
       {/* Loading Message */}
@@ -84,3 +91,4 @@ function MessageList() {
 }
 
 export default MessageList;
+

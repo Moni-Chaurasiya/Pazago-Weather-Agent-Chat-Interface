@@ -5,11 +5,13 @@ import {
   createAgentMessage,
 } from "../utils/messageUtils";
 
-// Weather API configuration
 const WEATHER_API_CONFIG = {
   endpoint:
     "https://millions-screeching-vultur.mastra.cloud/api/agents/weatherAgent/stream",
   headers: {
+    "Accept": "*/*",
+    "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8,fr;q=0.7",
+    "Connection": "keep-alive",
     "Content-Type": "application/json",
     "x-mastra-dev-playground": "true",
   },
@@ -30,7 +32,7 @@ export function useWeatherApi() {
         messages: [
           {
             role: "user",
-            content: userMessage,
+            content: userMessage
           },
         ],
         runId: "weatherAgent",
@@ -39,8 +41,8 @@ export function useWeatherApi() {
         temperature: 0.5,
         topP: 1,
         runtimeContext: {},
-        threadId: 2, // number, not string
-        resourceId: "weatherAgent", // fixed typo
+        threadId: 2,
+        resourceId: "weatherAgent",
       };
 
       const response = await fetch(WEATHER_API_CONFIG.endpoint, {
@@ -55,6 +57,7 @@ export function useWeatherApi() {
         );
       }
 
+      /*
       const reader = response.body.getReader();
       const decoder = new TextDecoder();
       let accumulatedResponse = "";
@@ -66,46 +69,105 @@ export function useWeatherApi() {
 
         const chunk = decoder.decode(value);
         const lines = chunk.split("\n");
+        for (const line of lines) {
+          if (line.startsWith('data: ')) {
+            try {
+              const data = JSON.parse(line.slice(6));
+              if (data.content) {
+                accumulatedResponse += data.content;
+                const agentMessage = createAgentMessage(accumulatedResponse, agentMessageId);
+                addMessage(agentMessage);
+              }
+            } catch (parseError) {
+              console.warn('Failed to parse streaming data:', parseError);
+            }
+          }
+        }
 
         // for (const line of lines) {
-        //   if (line.startsWith('data: ')) {
-        //     try {
-        //       const data = JSON.parse(line.slice(6));
-        //       if (data.content) {
-        //         accumulatedResponse += data.content;
-        //         const agentMessage = createAgentMessage(accumulatedResponse, agentMessageId);
-        //         addMessage(agentMessage);
-        //       }
-        //     } catch (parseError) {
-        //       console.warn('Failed to parse streaming data:', parseError);
+        //   if (!line.trim()) continue;
+
+        //   try {
+        //     // Some APIs send `data: {...}`, others send raw JSON
+        //     const cleanLine = line.startsWith("data: ") ? line.slice(6) : line;
+
+        //     const data = JSON.parse(cleanLine);
+
+        //     // Handle token-style responses
+        //     if (data.content) {
+        //       accumulatedResponse += data.content;
+        //     } else if (typeof data[0] === "string") {
+        //       accumulatedResponse += data[0];
         //     }
+
+        //     if (accumulatedResponse) {
+        //       const agentMessage = createAgentMessage(
+        //         accumulatedResponse,
+        //         agentMessageId
+        //       );
+        //       addMessage(agentMessage);
+        //     }
+        //   } catch (parseError) {
+        //     console.warn("Failed to parse streaming data:", line, parseError);
         //   }
         // }
+
+      }
+
+      */
+
+      const reader = response.body.getReader();
+      const decoder = new TextDecoder();
+      let accumulatedResponse = "";
+      let agentMessageId = generateMessageId();
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        const chunk = decoder.decode(value, { stream: true });
+        const lines = chunk.split("\n").filter(Boolean);
+
         for (const line of lines) {
-          if (!line.trim()) continue;
-
           try {
-            // Some APIs send `data: {...}`, others send raw JSON
-            const cleanLine = line.startsWith("data: ") ? line.slice(6) : line;
+        
+            const [prefix, json] = line.split(/:(.+)/); 
+            if (!json) continue;
 
-            const data = JSON.parse(cleanLine);
-
-            // Handle token-style responses
-            if (data.content) {
-              accumulatedResponse += data.content;
-            } else if (typeof data[0] === "string") {
-              accumulatedResponse += data[0];
-            }
-
-            if (accumulatedResponse) {
+            if (prefix === "0") {
+         
+              accumulatedResponse += JSON.parse(json); 
               const agentMessage = createAgentMessage(
                 accumulatedResponse,
                 agentMessageId
               );
               addMessage(agentMessage);
             }
-          } catch (parseError) {
-            console.warn("Failed to parse streaming data:", line, parseError);
+
+            if (prefix === "a") {
+    
+              const data = JSON.parse(json);
+              console.log("Tool result:", data);
+
+              const weatherInfo = data.result;
+              if (weatherInfo) {
+                const structuredMessage =
+                  `🌤️ Weather in ${weatherInfo.location}:\n` +
+                  `Temperature: ${weatherInfo.temperature}°C (feels like ${weatherInfo.feelsLike}°C)\n` +
+                  `Humidity: ${weatherInfo.humidity}%\n` +
+                  `Wind: ${weatherInfo.windSpeed} km/h (gusts up to ${weatherInfo.windGust} km/h)\n` +
+                  `Conditions: ${weatherInfo.conditions}`;
+
+                const agentMessage = createAgentMessage(
+                  structuredMessage,
+                  agentMessageId
+                );
+                addMessage(agentMessage);
+              }
+            }
+
+          } catch (err) {
+            console.warn("Failed to parse line:", line, err);
           }
         }
       }
