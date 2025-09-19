@@ -1,5 +1,5 @@
 import { ChatProvider } from "./context/ChatContext";
-import ThemeProvider from "./theme/ThemeProvider";
+import ThemeProvider from "./components/theme/ThemeProvider";
 import ChatInterface from "./components/ChatInterface";
 import "./App.css";
 function App() {
