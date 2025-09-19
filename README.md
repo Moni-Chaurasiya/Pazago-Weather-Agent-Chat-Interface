@@ -83,10 +83,13 @@ The app will start at:
 * 📥 Click the **download icon** to export chat
 * 🗑️ Click the **trash icon** to clear messages
 
-## 📸 Screenshots
+## 📸 Screenshots of Output
 
-### WeatherApp
+### WeatherApp LightMode
 ![Light Mode](public/Weather.png)
 
-### WeatherApp
+### WeatherApp DarkMode and Other features
 ![Dark Mode with other features](public/DarkMode.png)
+
+### WeatherApp Chat Output
+![Output of Chat](public/Output.png)
