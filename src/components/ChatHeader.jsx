@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Cloud, Sun, Moon, Search, Trash2, Download, X } from 'lucide-react';
-import { useTheme } from './theme/ThemeProvider';
+import { useTheme } from './Theme/ThemeProvider';
 import { useChat } from '../context/ChatContext';
 import { exportChatAsText } from '../utils/exportUtils';
 
