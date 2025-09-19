@@ -85,3 +85,10 @@ The app will start at:
 * 📥 Click the **download icon** to export chat
 * 🗑️ Click the **trash icon** to clear messages
 
+## 📸 Screenshots
+
+### Home Page
+![Home Page](public/Weather.png)
+
+### Chat Interface
+![Chat Interface](public/DarkMode.png)
