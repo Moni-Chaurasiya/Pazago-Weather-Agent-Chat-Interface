@@ -1,10 +1,10 @@
 
 import React from 'react';
 import { User, Bot, Cloud, Check, CheckCheck } from 'lucide-react';
-import { formatTime } from '../../utils/dateUtils';
+import { formatTime } from '../utils/dateUtils';
+import { highlightSearchText } from '../utils/searchUtils';
 
-
-function Message({ message }) {
+function Message({ message, searchQuery }) {
   const isUser = message.role === 'user';
   const isDelivered = message.status === 'delivered';
   const isRead = message.status === 'read';
@@ -33,8 +33,9 @@ function Message({ message }) {
           } shadow-sm`}>
             {/* Message Text */}
             <div className="text-sm leading-relaxed break-words whitespace-pre-wrap">
-              {
-                 message.content
+              {searchQuery 
+                ? highlightSearchText(message.content, searchQuery)
+                : message.content
               }
             </div>
 

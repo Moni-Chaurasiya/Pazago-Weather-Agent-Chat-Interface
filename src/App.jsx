@@ -1,5 +1,5 @@
 import { ChatProvider } from "./context/ChatContext";
-import ThemeProvider from "./theme/themeProvider";
+import ThemeProvider from "./theme/ThemeProvider";
 import ChatInterface from "./components/ChatInterface";
 import "./App.css";
 function App() {
@@ -13,3 +13,4 @@ function App() {
     </ThemeProvider>
   );
 }
+export default App;

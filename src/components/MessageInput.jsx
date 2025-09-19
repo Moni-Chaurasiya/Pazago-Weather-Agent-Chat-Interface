@@ -1,8 +1,8 @@
 
 import React, { useState, useRef } from 'react';
 import { Send, Paperclip } from 'lucide-react';
-import { useChat } from '../../context/ChatContext';
-import { useWeatherApi } from '../../hooks/useWeatherApi';
+import { useChat } from '../context/ChatContext';
+import { useWeatherApi } from '../hooks/useWeatherApi';
 
 function MessageInput() {
   const [message, setMessage] = useState('');
