@@ -87,8 +87,8 @@ The app will start at:
 
 ## 📸 Screenshots
 
-### Home Page
-![Home Page](public/Weather.png)
+### WeatherApp
+![Light Mode](public/Weather.png)
 
-### Chat Interface
-![Chat Interface](public/DarkMode.png)
+### WeatherApp
+![Dark Mode with other features](public/DarkMode.png)
