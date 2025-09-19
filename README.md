@@ -1,5 +1,3 @@
-Here’s a polished `README.md` code for your **Weather Agent Chat Interface** project:
-
 ````markdown
 # 🌦️ Weather Agent Chat Interface
 
