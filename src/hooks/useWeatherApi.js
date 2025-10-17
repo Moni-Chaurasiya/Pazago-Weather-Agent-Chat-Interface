@@ -9,16 +9,16 @@ const WEATHER_API_CONFIG = {
   endpoint:
     "https://millions-screeching-vultur.mastra.cloud/api/agents/weatherAgent/stream",
   headers: {
-    "Accept": "*/*",
+    Accept: "*/*",
     "Accept-Language": "en-GB,en-US;q=0.9,en;q=0.8,fr;q=0.7",
-    "Connection": "keep-alive",
+    Connection: "keep-alive",
     "Content-Type": "application/json",
     "x-mastra-dev-playground": "true",
   },
 };
 
 export function useWeatherApi() {
-  const { addMessage, setLoading, setError } = useChat();
+  const { addMessage, setLoading, setError, updateMessage } = useChat();
 
   const sendMessage = async (userMessage) => {
     try {
@@ -32,7 +32,7 @@ export function useWeatherApi() {
         messages: [
           {
             role: "user",
-            content: userMessage
+            content: userMessage,
           },
         ],
         runId: "weatherAgent",
@@ -121,6 +121,9 @@ export function useWeatherApi() {
       let accumulatedResponse = "";
       let agentMessageId = generateMessageId();
 
+      let agentMessage = createAgentMessage("", agentMessageId);
+      addMessage(agentMessage); // Add once
+
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
@@ -130,42 +133,45 @@ export function useWeatherApi() {
 
         for (const line of lines) {
           try {
-        
-            const [prefix, json] = line.split(/:(.+)/); 
+            const [prefix, json] = line.split(/:(.+)/);
             if (!json) continue;
 
             if (prefix === "0") {
-         
-              accumulatedResponse += JSON.parse(json); 
-              const agentMessage = createAgentMessage(
-                accumulatedResponse,
-                agentMessageId
-              );
-              addMessage(agentMessage);
+              accumulatedResponse += JSON.parse(json);
+              // const agentMessage = createAgentMessage(
+              //   accumulatedResponse,
+              //   agentMessageId
+              // );
+              // addMessage(agentMessage);
+              updateMessage({ ...agentMessage, content: accumulatedResponse });
             }
 
             if (prefix === "a") {
-    
               const data = JSON.parse(json);
               console.log("Tool result:", data);
 
               const weatherInfo = data.result;
               if (weatherInfo) {
-                const structuredMessage =
-                  `🌤️ Weather in ${weatherInfo.location}:\n` +
-                  `Temperature: ${weatherInfo.temperature}°C (feels like ${weatherInfo.feelsLike}°C)\n` +
-                  `Humidity: ${weatherInfo.humidity}%\n` +
-                  `Wind: ${weatherInfo.windSpeed} km/h (gusts up to ${weatherInfo.windGust} km/h)\n` +
-                  `Conditions: ${weatherInfo.conditions}`;
+const structuredMessage = 
+  `🌤️ Weather in ${weatherInfo.city}:\n` +
+  `- Temperature: ${weatherInfo.temperature}°C (feels like ${weatherInfo.feelsLike}°C)\n` +
+  `- Conditions: ${weatherInfo.conditions}\n` +
+  `- Humidity: ${weatherInfo.humidity}%\n` +
+  `- Wind Speed: ${weatherInfo.windSpeed} km/h (gusts up to ${weatherInfo.windGust} km/h)\n` +
+  `The current weather in ${weatherInfo.city} is ${weatherInfo.conditions.toLowerCase()} with a temperature of ${weatherInfo.temperature}°C, but it feels like ${weatherInfo.feelsLike}°C due to the high humidity of ${weatherInfo.humidity}%. The wind is blowing at ${weatherInfo.windSpeed} km/h, with gusts up to ${weatherInfo.windGust} km/h.`;
 
-                const agentMessage = createAgentMessage(
-                  structuredMessage,
-                  agentMessageId
-                );
-                addMessage(agentMessage);
+
+                // const agentMessage = createAgentMessage(
+                //   structuredMessage,
+                //   agentMessageId
+                // );
+                // addMessage(agentMessage);
+                updateMessage({
+                  ...agentMessage,
+                  content: structuredMessage,
+                });
               }
             }
-
           } catch (err) {
             console.warn("Failed to parse line:", line, err);
           }
@@ -173,16 +179,29 @@ export function useWeatherApi() {
       }
 
       if (accumulatedResponse.trim()) {
-        const finalMessage = createAgentMessage(
-          accumulatedResponse,
-          agentMessageId
-        );
-        finalMessage.status = "delivered";
-        addMessage(finalMessage);
+        // const finalMessage = createAgentMessage(
+        //   accumulatedResponse,
+        //   agentMessageId
+        // );
+        // finalMessage.status = "delivered";
+        // addMessage(finalMessage);
+
+        // setTimeout(() => {
+        //   finalMessage.status = "read";
+        //   addMessage({ ...finalMessage });
+        // }, 1500);
+        updateMessage({
+          ...agentMessage,
+          content: accumulatedResponse,
+          status: "delivered",
+        });
 
         setTimeout(() => {
-          finalMessage.status = "read";
-          addMessage({ ...finalMessage });
+          updateMessage({
+            ...agentMessage,
+            content: accumulatedResponse,
+            status: "read",
+          });
         }, 1500);
       } else {
         throw new Error("No response received from weather agent");

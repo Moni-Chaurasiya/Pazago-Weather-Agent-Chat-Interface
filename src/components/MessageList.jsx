@@ -8,11 +8,13 @@ function MessageList() {
   const { messages, isLoading, error, searchQuery, filteredMessages } = useChat();
   const messagesEndRef = useRef(null);
   const containerRef = useRef(null);
-  const [isAtBottom, setIsAtBottom] = useState(true);
+ const [isAtBottom, setIsAtBottom] = useState(true);
 
   // Auto-scroll only if user is at bottom
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    //messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: isAtBottom ? "smooth" : "auto" });
+
   };
 
   useEffect(() => {
@@ -91,4 +93,3 @@ function MessageList() {
 }
 
 export default MessageList;
-
