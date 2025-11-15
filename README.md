@@ -86,7 +86,7 @@ The app will start at:
 ## 📸 Screenshots of Output
 
 ### WeatherApp LightMode
-![Light Mode](public/Weather.png)
+![Light Mode](public/Output.png)
 
 ### WeatherApp DarkMode and Other features
 ![Dark Mode with other features](public/DarkMode.png)
