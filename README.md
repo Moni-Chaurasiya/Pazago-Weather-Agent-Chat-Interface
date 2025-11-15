@@ -1,9 +1,8 @@
-````markdown
+
 # 🌦️ Weather Agent Chat Interface
 
 A **responsive chat interface** for interacting with a weather agent API, built with **React, Vite, and Tailwind CSS**.
 
----
 
 ## 🚀 Features
 - 💬 Chat-style interface for weather queries  
@@ -14,7 +13,14 @@ A **responsive chat interface** for interacting with a weather agent API, built 
 - ⚡ Built with React + Vite for fast performance  
 - 🎨 Styled using Tailwind CSS  
 
----
+
+## 📸 Screenshots of Output
+
+### WeatherApp LightMode
+![Light Mode](public/Output.png)
+
+### WeatherApp DarkMode and Other features
+![Dark Mode with other features](public/DarkMode.png)
 
 ## 📋 Prerequisites
 Before you begin, make sure you have the following installed:
@@ -83,11 +89,6 @@ The app will start at:
 * 📥 Click the **download icon** to export chat
 * 🗑️ Click the **trash icon** to clear messages
 
-## 📸 Screenshots of Output
 
-### WeatherApp LightMode
-![Light Mode](public/Output.png)
 
-### WeatherApp DarkMode and Other features
-![Dark Mode with other features](public/DarkMode.png)
 
