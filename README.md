@@ -91,5 +91,3 @@ The app will start at:
 ### WeatherApp DarkMode and Other features
 ![Dark Mode with other features](public/DarkMode.png)
 
-### WeatherApp Chat Output
-![Output of Chat](public/Output.png)
